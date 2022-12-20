@@ -9,16 +9,17 @@ class mediaAudio extends mediaFile
 
 
 
-  public $path;
-
-
-  public function __construct($path)
+  public function __construct($file, $useID3 = true)
   {
-    if ($path)
+    if (is_file($file) && in_array(Utils::getExtension($file), $this->detectableFiles))
     {
-      $this->path = $path;
-      if (!in_array($this->file_info['extension'], $this->detectableFiles)) throw new Exception("The file is not an audio format.");
-    }
+      parent::__construct($file, $useID3);
+    } else throw new Exception("The file is not a image.");
+  }
+
+  public function Info()
+  {
+    return $this->info;
   }
 
 }

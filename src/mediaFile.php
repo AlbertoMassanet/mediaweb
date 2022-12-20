@@ -1,6 +1,7 @@
 <?php
 
 include_once "Utils.php";
+include_once "vendor/getid3/getid3.php";
 
 class mediaFile
 {
@@ -12,7 +13,10 @@ class mediaFile
   protected $aceptableSufixFiles = [];
 
   protected $file;
-  protected $info = [];
+  protected $info;
+  protected $getId;
+
+  protected $useID3 = false;
 
   protected $units = array(
     'bit' => 0.125,
@@ -22,18 +26,49 @@ class mediaFile
     'TB' => 1099511627776
   );
 
-  public function __construct($file)
+  public function __construct($file, $useID3 = true)
   {
-    if ($file)
+    if (is_file($file))
     {
       $this->file = $file;
-      $this->getInfo($file);
-    } else throw new Exception("File cannot be empty.");
+      $this->useID3 = $useID3;
+      if ($this->useID3) 
+        $this->initializeID3(); 
+      else 
+        $this->getSimpleInfo();
+    } else throw new Exception("{$file} is not a file.");
   }
 
-  protected function getInfo($file)
+  protected function initializeID3()
   {
-    $this->info = Utils::getInfoFromFile($file);
+    // Initialize getID3 engine
+		$this->getID3 = new getID3;
+		$this->getID3->option_md5_data        = true;
+		$this->getID3->option_md5_data_source = true;
+		$this->getID3->encoding               = 'UTF-8';
+  }
+
+  /**
+	* Extract information using getID3
+	*
+	* @param    string  $file    Audio file to extract info from.
+	*
+	* @return array
+	*/
+  protected function infoID3()
+  {
+    // Analyze file
+		$this->info = $this->getID3->analyze($this->file);
+
+		// Exit here on error
+		if (isset($this->info['error'])) {
+			throw new Exception("'{$this->file}' has raised an error: " . $this->info['error']);
+		}
+  }
+
+  protected function getSimpleInfo()
+  {
+    $this->info = Utils::getInfoFromFile($this->file);
     if (empty($this->info)) throw new Exception("String '{$this->file}' is not a file.");
   }
 
