@@ -7,12 +7,7 @@ include_once 'mediaBook.php';
 class Media extends mediaFiles
 {
     
-  public static $MEDIA_TYPES = [
-    "MEDIA_BOOK" => "book",
-    "MEDIA_AUDIO" => "audio",
-    "MEDIA_VIDEO" => "video",
-    "MEDIA_IMAGES" => "images",
-  ];
+
 
   /**
    * Full path and filename where data has been saved

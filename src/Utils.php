@@ -89,11 +89,12 @@ class Utils
         $pathinfo = pathinfo($file);
         $stat = stat($file);
 
+            $file_info['filenamepath'] = $file;
             $file_info['realpath'] = realpath($file);
-            $file_info['dirname'] = $pathinfo['dirname'];
-            $file_info['basename'] = $pathinfo['basename'];
-            $file_info['filename'] = $pathinfo['filename'];
-            $file_info['extension'] = $pathinfo['extension'];
+            $file_info['filepath'] = $pathinfo['dirname'];
+            $file_info['filename'] = $pathinfo['basename'];
+            $file_info['filerealname'] = $pathinfo['filename'];
+            $file_info['fileformat'] = $pathinfo['extension'];
             $file_info['mime'] = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $file);
             $file_info['encoding'] = finfo_file(finfo_open(FILEINFO_MIME_ENCODING), $file);
             $file_info['size'] = $stat[7];
