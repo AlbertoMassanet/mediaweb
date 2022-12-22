@@ -21,10 +21,18 @@ class Media extends mediaFiles
    * 
    * @var String
    */
-  public $media_type = "";
+  public $media = "";
+  public $path;
 
-  public function __construct($media = "")
+  public function __construct($path, $media = "")
   {
-    $this->media_type = $media;
+    $this->path = $path;
+    $this->media = $media;
+    if (isset($this->path)) parent::__construct($this->path);
+  }
+
+  public function showTree()
+  {
+    return (isset($this->path)) ? $this->tree($this->path) : null;
   }
 }

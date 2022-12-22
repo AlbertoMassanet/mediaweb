@@ -71,7 +71,7 @@ class mediaFiles
   }
 
     // List files in tree, matching wildcards * and ?
-  public function tree($path){
+  protected function tree($path){
     static $match;
 
     // Find the real directory part of the path, and set the match parameter
@@ -114,12 +114,14 @@ class mediaFiles
   }
 
   /**
+   * Find specific files from a directory
    * findFiles("C:", array (
     *  "jpg",
     *  "pdf",
     *  "png",
     *  "html"
-    *))
+    * ))
+    *
    */
   public function findFiles($directory, $extensions = array()) {
     function glob_recursive($directory, &$directories = array()) {

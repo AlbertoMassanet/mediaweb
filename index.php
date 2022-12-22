@@ -23,7 +23,7 @@
 
     $metadata = new OPFReader("./test/metadata.opf");
 
-    $prueba = new mediaFiles('/media/jefe/TOSHIBA EXT/Media/libros/');
+    $prueba = new Media('/media/jefe/TOSH_EXT_NTFS/Media/libros/', 'book');
     
 
 
@@ -227,23 +227,24 @@
                     echo "<br>";
                     print_r($metadata->getCover());
                     echo "<br>";
-                    echo "-->" . is_dir('/media/jefe/"TOSHIBA EXT"/Media/libros/') ? ' Es ' : ' No';
-                    $directory = dir('/media/jefe/"TOSHIBA EXT"/Media/libros/');
+                    echo "-->" . is_dir('/media/jefe/TOSH_EXT_NTFS/Media/libros/') ? ' Es ' : ' No';
+                    // $directory = dir('/media/jefe/TOSH_EXT_NTFS/Media/libros/');
    
-                    // Exploring directories and their contents
-                    echo "Handle: " . $directory->handle . "\n";
-                    echo "Path: " . $directory->path . "";
+                    // // Exploring directories and their contents
+                    // echo "Handle: " . $directory->handle . "<br>";
+                    // echo "Path: " . $directory->path . "<br>";
                        
-                    // If the evaluation is true then, the loop will
-                    // continue otherwise any directory entry with name
-                    // equals to FALSE will stop the loop .
-                    while (($file = $directory->read()) !== false) {
+                    // // If the evaluation is true then, the loop will
+                    // // continue otherwise any directory entry with name
+                    // // equals to FALSE will stop the loop .
+                    // while (($file = $directory->read()) !== false) {
                            
-                        // printing Filesystem objects/functions with PHP
-                        echo "filename: " . $file . "\n";
-                    }
-                    $directory->close();
-                    //print_r($prueba->tree('/media/jefe/"TOSHIBA EXT"/Media/libros/'));
+                    //     // printing Filesystem objects/functions with PHP
+                    //     echo "filename: " . $file . "<br>";
+                    // }
+                    // $directory->close();
+                    echo "<pre>" . print_r($prueba->showTree(),true) . "</pre>";
+                    
                 ?>
 
 

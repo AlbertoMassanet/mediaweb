@@ -1,10 +1,10 @@
 <?php
 
-include_once "mediaFiles.php";
+include_once "mediaFile.php";
 
 include_once "metadata/OPFReader.php";
 
-class mediaBook extends mediaFiles
+class mediaBook extends mediaFile
 {
   public $detectableFiles = [
           "epub", "html", "htm", "pdf", "rtf", "txt", "cbc", "fb2", "lit", "mobi", "odt", "doc", "docx", "prc", "pdb", "pml", "cbz", "cbr"
@@ -12,7 +12,7 @@ class mediaBook extends mediaFiles
 
   public $aceptableMetadataFiles = ["metadata.opf", "opf", "txt"];
 
-  public $aceptableCoverFiles = ["cover.jpg", "jpg", "png", "gif"];
+  public $aceptableCoverFiles = ["cover.jpg", "cover.*", "portada.*", "contraportada.*", "jpg", "png", "gif"];
 
 
 
