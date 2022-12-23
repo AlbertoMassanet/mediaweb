@@ -1,10 +1,14 @@
 <?php
 
 include_once "Utils.php";
-include_once "vendor/getid3/getid3.php";
+
 
 class mediaFile
 {
+
+  const FIND_FILE_COVER = 1;
+  const FIND_FILE_METADATA = 2;
+
   protected $detectableFiles = [];
   protected $aceptableMetadataFiles = [];
   protected $aceptableCoverFiles = [];
@@ -12,11 +16,11 @@ class mediaFile
   protected $aceptablePrefixFiles = [];
   protected $aceptableSufixFiles = [];
 
-  protected $file;
+  protected $fullfile;
+  protected $path_file;
+  protected $name_file;
   protected $info;
   protected $getId;
-
-  protected $useID3 = false;
 
   protected $units = array(
     'bit' => 0.125,
@@ -26,20 +30,17 @@ class mediaFile
     'TB' => 1099511627776
   );
 
-  public function __construct($file, $useID3 = true)
+  public function __construct($file)
   {
     if (is_file($file))
     {
-      $this->file = $file;
-      $this->useID3 = $useID3;
-      if ($this->useID3) 
-        $this->initializeID3(); 
-      else 
-        $this->getSimpleInfo();
+      $this->fullfile = $file;
+      $this->path_file = Utils::getPathFromFilePath($file);
+      $this->name_file = Utils::getFilenameFromFilePath($file);
     } else throw new Exception("{$file} is not a file.");
   }
 
-  protected function initializeID3()
+  private function initializeID3()
   {
     // Initialize getID3 engine
 		$this->getID3 = new getID3;
@@ -55,21 +56,22 @@ class mediaFile
 	*
 	* @return array
 	*/
-  protected function infoID3()
+  protected function getInfoID3()
   {
+    $this->initializeID3();
     // Analyze file
-		$this->info = $this->getID3->analyze($this->file);
+		$this->info = $this->getID3->analyze($this->fullfile);
 
 		// Exit here on error
 		if (isset($this->info['error'])) {
-			throw new Exception("'{$this->file}' has raised an error: " . $this->info['error']);
+			throw new Exception("'{$this->fullfile}' has raised an error: " . $this->info['error']);
 		}
   }
 
   protected function getSimpleInfo()
   {
-    $this->info = Utils::getInfoFromFile($this->file);
-    if (empty($this->info)) throw new Exception("String '{$this->file}' is not a file.");
+    $this->info = Utils::getInfoFromFile($this->fullfile);
+    if (empty($this->info)) throw new Exception("String '{$this->fullfile}' is not a file.");
   }
 
     /**

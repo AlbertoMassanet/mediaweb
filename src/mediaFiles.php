@@ -41,33 +41,40 @@ class mediaFiles
     //TODO
   }
 
-  private function _recursiveDir($path, $media = "")
-  {
-    $files = array();
-   
-    if(is_dir($path))
-    {
-        if($handle = opendir($path))
-        {
-            while(($name = readdir($handle)) !== false)
-            {
-                if(!preg_match("#^\.#", $name))
-                  if(is_dir($path . "/" . $name))
-                  {
-                      $files[$name] = $this->_recursiveDir($path . "/" . $name);
-                  }
-                  else
-                  {
-                      $files[] = $name;
-                  }
-            }
-           
-            closedir($handle);
+  /**
+   * List specified extension files in directories recursively 
+   * 
+   * @param String $dir Full path to directory. Ex. '/path/to/directory'
+   * @param Array $fileTypes Array of extensions to find Ex. array('jpg', 'png', 'gif')
+   * 
+   * @return Array 
+   */
+  protected function listDirectory($dir, $fileTypes) {
+    // Abrimos el directorio
+    $directory = opendir($dir);
+  
+    // Creamos un array para almacenar los archivos que cumplan con los tipos especificados
+    $selectedFiles = array();
+  
+    // Iteramos a través de cada archivo del directorio
+    while (($file = readdir($directory)) !== false) {
+      // Verificamos si el archivo es un directorio o no
+      if (is_dir($dir . '/' . $file)) {
+        // Si es un directorio, llamamos recursivamente a la función
+        $selectedFiles = array_merge($selectedFiles, $this->listDirectory($dir . '/' . $file, $fileTypes));
+      } else {
+        // Si no es un directorio, verificamos si el archivo cumple con los tipos especificados
+        $extension = pathinfo($file, PATHINFO_EXTENSION);
+        if (in_array($extension, $fileTypes)) {
+          // Si cumple, agregamos el archivo al array
+          $selectedFiles[] = $dir . '/' . $file;
         }
+      }
     }
-
-    return $files;
-
+  
+    // Cerramos el directorio y devolvemos el array con los archivos seleccionados
+    closedir($directory);
+    return $selectedFiles;
   }
 
     // List files in tree, matching wildcards * and ?

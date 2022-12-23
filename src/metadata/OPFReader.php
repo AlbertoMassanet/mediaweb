@@ -1,114 +1,100 @@
 <?php
 
+class OPFReader {
+  private $xml;
+  private $filepath;
 
-class OPFReader
-{
-    public $namespace = ["namespace" => "dc", "url" => "http://purl.org/dc/elements/1.1/"];
-    public $useNamespace = true;
-    
-    public $nameTags = ['title', 'creator', 'date', 'description', 'language', 'subject'];
-    public $imageTag = ['tag' => 'reference', 'type'=> 'cover', 'return' => 'href']; // NOT IN USE
+  public function __construct($filePath) {
+    // Cargamos el archivo OPF en un objeto SimpleXML
+    $this->xml = simplexml_load_file($filePath);
+    $this->filepath = $filePath;
+  }
 
-    private $file;
-    private $path;
-    private $filename;
-
-    private $useDOM = false;
-
-    protected $objXML;
-    protected $rawDoc;
-
-  public function __construct($file = "", $useDOM = false)
-  {
-    $this->useDOM = $useDOM;
-    if (!empty($file))
-    {
-      $this->setFile($file);
-      $this->setDoc();
+  public function getTitle() {
+    // Buscamos el título del libro en los metadatos
+    $title = $this->xml->metadata->children('dc', true)->title;
+    if ($title) {
+      return (string)$title;
     }
-    
-    return $this;
+    return null;
   }
 
-
-  public function setFile($file)
-  {
-    if (is_file($file)) 
-    {
-      $this->file = $file;
-      $this->path = Utils::getPathFromFilePath($file);
-      $this->filename = Utils::getFilenameFromFilePath($file);
-      $this->rawDoc = file_get_contents($file);
-      if (!mb_detect_encoding($this->rawDoc, 'UTF-8', true)) $this->rawDoc = mb_convert_encoding($this->rawDoc, 'UTF-8', 'auto');
+  public function getLanguage() {
+    // Buscamos el idioma del libro en los metadatos
+    $language = $this->xml->metadata->children('dc', true)->language;
+    if ($language) {
+      return (string)$language;
     }
-    else
-      throw new Exception(" '{$file}' is not a file.");
-
-    return $this;
+    return null;
   }
 
-  public function setNamespace($arr)
-  {
-    if (is_array($arr))
-      $this->namespace = $arr;
-
-    return $this;
-  }
-
-  public function setUseNamespace($bool)
-  {
-    if (is_bool($bool)) $this->useNamespace = $bool;
-
-    return $this;
-  }
-
-  public function setDoc()
-  {
-    if ($this->useDOM)
-    {
-      $this->objXML = new DOMDocument;
-      $this->objXML->loadXML($this->rawDoc);
-    } else {
-      $this->objXML = new SimpleXMLElement($this->rawDoc);
+  public function getDescription() {
+    // Buscamos la sinopsis del libro en los metadatos
+    $description = $this->xml->metadata->children('dc', true)->description;
+    if ($description) {
+      return (string)$description;
     }
+    return null;
   }
 
-
-  public function getTagMetadata($tag)
-  {
-    $this->objXML->registerXPathNamespace($this->namespace['namespace'], $this->namespace['url']);
-    $ns = '//' . $this->namespace['namespace'] . ':';
-    $result = $this->objXML->xpath($ns . $tag);
-
-    return (string)$result[0];
+  public function getAuthor() {
+    // Buscamos el autor del libro en los metadatos
+    $author = $this->xml->metadata->children('dc', true)->creator;
+    if ($author) {
+      return (string)$author;
+    }
+    return null;
   }
 
-  public function getAllMetadata()
-  {
-    $result = [];
+  public function getChapters() {
+    // Creamos un array para almacenar los capítulos del libro
+    $chapters = array();
 
-    foreach ($this->nameTags as $tag)
-      $result[$tag] = $this->getTagMetadata($tag);
-
-    return $result;
+    // Iteramos a través de cada item del spine (que contiene la lista de capítulos del libro)
+    foreach ($this->xml->spine->itemref as $item) {
+      // Buscamos el título del capítulo en los metadatos
+      $id = (string)$item['idref'];
+      $title = $this->xml->manifest->item[$id]->metadata->children('dc', true)->title;
+      if ($title) {
+        $chapters[] = (string)$title;
+      }
+    }
+    return $chapters;
   }
 
-  public function getCover()
-  {
-    //$pattern = '//' . $this->imageTag['tag'];
-    //$result = $this->objXML->xpath('//reference[@type="cover"]');
-
-    // OPF Cover
-    $result = $this->objXML->guide->reference['href'];
-    if ($result) 
-      $result = $this->path . DIRECTORY_SEPARATOR . (string) $result;
-
-    return $result;
-
+  public function getCoverImage() {
+    // Buscamos el elemento manifest que corresponda a la portada del libro
+    $manifest = $this->xml->manifest->item[0];
+    if (!$manifest) {
+      return null;
+    }
+  
+    // Obtenemos la ruta del archivo de la portada
+    $coverPath = (string)$manifest['href'];
+  
+    // Si la ruta es relativa, la convertimos a absoluta
+    if (!preg_match('/^https?:\/\//', $coverPath)) {
+      $coverPath = dirname($this->filepath) . PATH_SEPARATOR . $coverPath;
+    }
+  
+    // Devolvemos la ruta del archivo de la portada
+    return $coverPath;
   }
 
-  public function getObj()
-  {
-    return $this->objXML;
+  public function getGenres() {
+    // Creamos un array para almacenar los géneros del libro
+    $genres = array();
+  
+    // Buscamos los géneros del libro en los metadatos
+    $metadata = $this->xml->metadata->children('dc', true)->subject;
+    if ($metadata) {
+      // Si hay más de un género, los separamos en un array
+      if (strpos($metadata, ',') !== false) {
+        $genres = explode(',', $metadata);
+      } else {
+        $genres[] = $metadata;
+      }
+    }
+    return $genres;
   }
 }
