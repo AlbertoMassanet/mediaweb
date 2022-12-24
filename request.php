@@ -12,8 +12,17 @@ define('RETURN_UPDATE_OK', 204);
 define('RETURN_DELETE_OK', 200);
 define('RETURN_ERROR_BAD_REQUEST', 400);
 
+
 include_once './src/Media.php';
-include_once './src/vendor/Request.php';
+include_once './src/vendor/Request/Request.php';
+
+$media_types = [
+  "book" => ["epub", "html", "htm", "pdf", "rtf", "txt", "cbc", "fb2", "lit", "mobi", "odt", "doc", "docx", "prc", "pdb", "pml", "cbz", "cbr"],
+  "audio" => ["mp3", "ogg", "wav", "3gp", "m4a", "wma", "wav"],
+  "video" => ["avi", "mp1", "mp2", "mp4", "webm", "amv", "mtv"],
+  "images" => ["jpg", "jpeg", "gif", "png"],
+];
+
 /**
  * Search a media type and return an array
  * 
@@ -64,10 +73,15 @@ if (is_array($arrRecieved))
    */
   if (key_exists('read', $_REQUEST))
   {
-    $res = Utils::loadFromFile(SAVEFILE);
-    $objSent = $res;
-    $returnType = (!is_array($res)) ? RETURN_ERROR_BAD_REQUEST : RETURN_READ_OK;
-    executeSearch();
+    if (file_exists(SAVEFILE))
+    {
+      $res = Utils::loadFromFile(SAVEFILE);
+      $objSent = $res;
+      $returnType = (!is_array($res)) ? RETURN_ERROR_BAD_REQUEST : RETURN_READ_OK;
+      executeSearch();
+    } else {
+      $objSent = ['error' => 'No file found'];
+    }
   }
 
   if (key_exists('media', $_REQUEST))

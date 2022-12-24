@@ -11,23 +11,25 @@ include_once "mediaVideo.php";
 
 class mediaFiles
 {
+  public $media_types = [];
+  public $media = "";
 
-  public static $MEDIA_TYPES = [
-    "book" => ["epub", "html", "htm", "pdf", "rtf", "txt", "cbc", "fb2", "lit", "mobi", "odt", "doc", "docx", "prc", "pdb", "pml", "cbz", "cbr"],
-    "audio" => ["mp3", "ogg", "wav", "3gp", "m4a", "wma", "wav"],
-    "video" => ["avi", "mp1", "mp2", "mp4", "webm", "amv", "mtv"],
-    "images" => ["jpg", "jpeg", "gif", "png"],
-  ];
-  
-  protected $path = null;
-  protected $files = [];
+  public $path = null;
+  public $files = [];
+
+  protected $objMedia;
 
   private $arrPath = [];
   private $activeDir;
 
-  public function __construct($path)
+  public function __construct($path, $media = "", $media_types = [])
   {
-    if (!empty($path)) $this->path = $path;
+    if (!empty($path)) 
+    {
+      $this->path = $path;
+      if (!empty($media)) $this->media = $media;
+      if (!empty($media_types)) $this->media_types = $media_types;
+    }
     else throw new Exception("Path cannot be empty.");
   }
   /**
@@ -88,20 +90,22 @@ class mediaFiles
       while(!is_dir($path=substr($path,0,$last)) && $last!==false)
         $last=strrpos($path,"/",-1);
     }
-    if(empty($match)) $match="/*";
+    $patt = (!empty($this->media_types) && !empty($this->media)) ? '.{' . implode(',', $this->media_types[$this->media]) . '}' : '';
+    if(empty($match)) $match="/*" . $patt;
     if(!$path=realpath($path)) return;
 
     // List files
-    foreach(glob($path.$match) as $file){
+    foreach(glob($path.$match, GLOB_BRACE) as $file){
       $list[]=substr($file,strrpos($file,"/")+1);
     } 
 
     // Process sub directories
     foreach(glob("$path/*", GLOB_ONLYDIR) as $dir){
-      $list[substr($dir,strrpos($dir,"/",-1)+1)]=$this->tree($dir);
+      $r = $this->tree($dir);
+      if ($r) $list[substr($dir,strrpos($dir,"/",-1)+1)]=$r;
     }
   
-    return @$list;
+    return ($list) ?? @$list;
   }
 
   public function getRecursiveFolderList($curDir,$currentA=false)

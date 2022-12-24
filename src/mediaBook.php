@@ -20,12 +20,20 @@ class mediaBook extends mediaFile
 
   protected $opf;
 
-  public function __construct($file)
+  public function __construct($file = "")
   {
     if (is_file($file) && in_array(Utils::getExtension($file), $this->detectableFiles))
     {
       parent::__construct($file);
-    } else throw new Exception("The file is not a image.");
+    } else return $this;
+  }
+
+  public function setFile($file)
+  {
+    if (is_file($file) && in_array(Utils::getExtension($file), $this->detectableFiles))
+    {
+      parent::__construct($file);
+    } else throw new Exception("The file is not a book.");
   }
 
   public function Info()

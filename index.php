@@ -8,22 +8,30 @@
 
     //$NFOnoXMLFilepath = realpath("test/formato_NFO_no_xml.nfo");
 
-    $nfoContent = file_get_contents("./test/formato_NFO_no_xml.nfo");
-    if (!mb_detect_encoding($nfoContent, 'UTF-8', true)) $nfoContent = mb_convert_encoding($nfoContent, 'UTF-8', 'auto');
+    // $nfoContent = file_get_contents("./test/formato_NFO_no_xml.nfo");
+    // if (!mb_detect_encoding($nfoContent, 'UTF-8', true)) $nfoContent = mb_convert_encoding($nfoContent, 'UTF-8', 'auto');
 
-    // Es formato XML (Kodi/XBMC)
-    if (strpos($nfoContent, '<?xml') === 0)
-    {
-        $nfoObject = simplexml_load_string($nfoContent) || die("Cannot create object");
-    }
-    // Es formato NO XML 
-    else {
+    // // Es formato XML (Kodi/XBMC)
+    // if (strpos($nfoContent, '<?xml') === 0)
+    // {
+    //     $nfoObject = simplexml_load_string($nfoContent) || die("Cannot create object");
+    // }
+    // // Es formato NO XML 
+    // else {
 
-    }
+    // }
 
-    $metadata = new OPFReader("./test/metadata.opf");
+    // $metadata = new OPFReader("./test/metadata.opf");
 
-    $prueba = new Media('/media/jefe/TOSH_EXT_NTFS/Media/libros/', 'book');
+    // 36 mime_types (23/12/2022)
+    $media_types = [
+        "book" => ["epub", "html", "htm", "pdf", "rtf", "txt", "cbc", "fb2", "lit", "mobi", "odt", "doc", "docx", "prc", "pdb", "pml", "cbz", "cbr"],
+        "audio" => ["mp3", "ogg", "wav", "3gp", "m4a", "wma", "wav"],
+        "video" => ["avi", "mp1", "mp2", "mp4", "webm", "amv", "mtv"],
+        "images" => ["jpg", "jpeg", "gif", "png"],
+    ];
+
+    $prueba = new Media('/media/jefe/TOSH_EXT_NTFS/Media/libros/', 'book', $media_types);
     
 
 
@@ -44,7 +52,7 @@
     <script defer src="assets/js/alpine.min.js"></script>
     
 </head>
-<body>
+<body x-data="{ tab: 'setting' }">
     <div class="navigation">
         <div class="menuToggle"></div>
         <div class="title-nav"><span>Media</span>&nbsp;<span>Explorer</span></div>
@@ -55,32 +63,32 @@
                     <span class="text">Refrescar</span>
                 </a>
             </li>
-            <li class="list" id="audio">
-                <a href="#" style="--clr: #f44336">
+            <li class="list" id="audio" :class="{ 'active': tab === 'audio' }">
+                <a href="#" style="--clr: #f44336" x-on:click.prevent="tab = 'audio'">
                     <span class="icon" title="Audios"><ion-icon name="musical-notes-outline"></ion-icon></span>
                     <span class="text">Audios</span>
                 </a>
             </li>
-            <li class="list" id="book">
-                <a href="#" style="--clr: #ffa117">
+            <li class="list" id="book" :class="{ 'active': tab === 'book' }">
+                <a href="#" style="--clr: #ffa117" x-on:click.prevent="tab = 'book'">
                     <span class="icon" title="Libros"><ion-icon name="book-outline"></ion-icon></span>
                     <span class="text">Libros</span>
                 </a>
             </li>
-            <li class="list" id="video">
-                <a href="#" style="--clr: #0fc70f"> 
+            <li class="list" id="video" :class="{ 'active': tab === 'video' }">
+                <a href="#" style="--clr: #0fc70f" x-on:click.prevent="tab = 'video'"> 
                     <span class="icon" title="Vídeos"><ion-icon name="film-outline"></ion-icon></span>
                     <span class="text">Videos</span>
                 </a>
             </li>
-            <li class="list" id="images">
-                <a href="#" style="--clr: #2196f3">
+            <li class="list" id="images" :class="{ 'active': tab === 'images' }">
+                <a href="#" style="--clr: #2196f3" x-on:click.prevent="tab = 'images'">
                     <span class="icon" title="Imágenes"><ion-icon name="image-outline"></ion-icon></span>
                     <span class="text">Imágenes</span>
                 </a>
             </li>
-            <li class="list active" id="setting">
-                <a href="#" style="--clr: #b145e9">
+            <li class="list" id="setting" :class="{ 'active': tab === 'setting' }">
+                <a href="#" style="--clr: #b145e9" x-on:click.prevent="tab = 'setting'">
                     <span class="icon" title="Ajustes"><ion-icon name="settings-outline"></ion-icon></span>
                     <span class="text">Ajustes</span>
                 </a>
@@ -88,7 +96,7 @@
         </ul>
     </div>
     <div class="container">
-        <div
+        <div 
         x-data=""
         class="fixed inset-0 flex flex-col-reverse items-end justify-start h-screen w-screen"
         @notice.window="$store.noticesHandler.add($event.detail)"
@@ -114,8 +122,9 @@
                     x-text="$store.noticesHandler.notice.text">
                 </div>
             </template>
+
         </div>
-        <div class="op-menu setting active" >
+        <div class="op-menu setting" x-show="tab === 'setting'" >
             <h2>Ajustes</h2>
             <div class="cont-form">
                 <form method="POST" @submit.prevent="submitForm" x-data="crudAlpine()" x-init="iniciar">
@@ -220,30 +229,13 @@
                     </div>
                 </form>
             </div>
-        </div>       
-                
-                <?php
-                    print_r($metadata->getAllMetadata());
-                    echo "<br>";
-                    print_r($metadata->getCover());
-                    echo "<br>";
-                    echo "-->" . is_dir('/media/jefe/TOSH_EXT_NTFS/Media/libros/') ? ' Es ' : ' No';
-                    // $directory = dir('/media/jefe/TOSH_EXT_NTFS/Media/libros/');
-   
-                    // // Exploring directories and their contents
-                    // echo "Handle: " . $directory->handle . "<br>";
-                    // echo "Path: " . $directory->path . "<br>";
-                       
-                    // // If the evaluation is true then, the loop will
-                    // // continue otherwise any directory entry with name
-                    // // equals to FALSE will stop the loop .
-                    // while (($file = $directory->read()) !== false) {
-                           
-                    //     // printing Filesystem objects/functions with PHP
-                    //     echo "filename: " . $file . "<br>";
-                    // }
-                    // $directory->close();
-                    echo "<pre>" . print_r($prueba->showTree(),true) . "</pre>";
+        </div>    
+
+        <div class="media" x-show="tab === 'book'" >
+                            
+        <?php
+
+                    //echo "<pre>" . print_r($prueba->showTree(),true) . "</pre>";
                     
                 ?>
 
@@ -251,7 +243,6 @@
             <!-- <div x-data="{ title: 'Start Here' }">
                 <h1 x-text="title"></h1>
             </div> -->
-        <div class="media">
             <div class="card">
                 <div class="face face1">
                     <div class="content">

@@ -2,8 +2,6 @@
 
 include_once "mediaFiles.php";
 
-include_once 'mediaBook.php';
-
 class Media extends mediaFiles
 {
     
@@ -16,23 +14,27 @@ class Media extends mediaFiles
    */
   public $fullsavefile = null; // Donde se guardan los datos si se han guardado.
 
-  /**
-   * Media types to search. Empty for all
-   * 
-   * @var String
-   */
-  public $media = "";
+  public $media_types = [];
+
   public $path;
 
-  public function __construct($path, $media = "")
+  public function __construct($path, $media = "", $media_types = [])
   {
     $this->path = $path;
-    $this->media = $media;
+    if (!empty($media)) $this->media = $media;
+    if (!empty($media_types)) $this->media_types = $media_types;
     if (isset($this->path)) parent::__construct($this->path);
+    return $this;
+  }
+
+  public function setMediaTypes($media_types)
+  {
+    $this->media_types = $media_types;
+    return $this;
   }
 
   public function showTree()
   {
-    return (isset($this->path)) ? $this->tree($this->path) : null;
+    return (isset($this->path)) ? $this->tree($this->path, ) : null;
   }
 }

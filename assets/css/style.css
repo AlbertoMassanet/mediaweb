@@ -348,7 +348,10 @@ ion-icon {
   background: var(--bgCont);
   padding: 15px;
   border-radius: 10px;
+  width: 100%;
 }
+
+
 
 .container .media
 {
@@ -448,7 +451,7 @@ ion-icon {
 }
 
 
-.container .op-menu
+.container .setting
 {
   position: relative;
   margin: 5px;
@@ -465,7 +468,7 @@ ion-icon {
 
 }
 
-.container .op-menu h2
+.container .setting h2
 {
   text-align: center;
   padding-bottom: 20px;
