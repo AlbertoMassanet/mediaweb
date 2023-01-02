@@ -28,7 +28,7 @@ class mediaFiles
     {
       $this->path = $path;
       if (!empty($media)) $this->media = $media;
-      if (!empty($media_types)) $this->media_types = $media_types;
+      if (!empty($media_types) && is_array($media_types)) $this->media_types = $media_types;
     }
     else throw new Exception("Path cannot be empty.");
   }
@@ -90,7 +90,7 @@ class mediaFiles
       while(!is_dir($path=substr($path,0,$last)) && $last!==false)
         $last=strrpos($path,"/",-1);
     }
-    $patt = (!empty($this->media_types) && !empty($this->media)) ? '.{' . implode(',', $this->media_types[$this->media]) . '}' : '';
+    $patt = (!empty($this->media_types) && !empty($this->media)) ? '.{' . implode(',', $this->media_types) . '}' : '';
     if(empty($match)) $match="/*" . $patt;
     if(!$path=realpath($path)) return;
 

@@ -18,11 +18,14 @@ class Media extends mediaFiles
 
   public $path;
 
-  public function __construct($path, $media = "", $media_types = [])
+  public $settings = [];
+
+  public function __construct($path, $media = "", $media_types = [], $settings = [])
   {
     $this->path = $path;
     if (!empty($media)) $this->media = $media;
     if (!empty($media_types)) $this->media_types = $media_types;
+    if (!empty($settings)) $this->settings = $settings;
     if (isset($this->path)) parent::__construct($this->path);
     return $this;
   }
@@ -33,8 +36,26 @@ class Media extends mediaFiles
     return $this;
   }
 
+  public function setMedia($media)
+  {
+    $this->media = $media;
+    return $this;    
+  }
+
+  public function setSetting($settings)
+  {
+    if (is_array($settings)) $this->settings = $settings;
+    return $this;    
+  }
+
   public function showTree()
   {
-    return (isset($this->path)) ? $this->tree($this->path, ) : null;
+    return (isset($this->path)) ? $this->tree($this->path) : null;
+  }
+
+
+  public function run()
+  {
+    
   }
 }

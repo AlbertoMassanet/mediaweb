@@ -52,7 +52,7 @@
     <script defer src="assets/js/alpine.min.js"></script>
     
 </head>
-<body x-data="{ tab: 'setting' }">
+<body x-data="{ $store.globalData.tab: 'setting' }">
     <div class="navigation">
         <div class="menuToggle"></div>
         <div class="title-nav"><span>Media</span>&nbsp;<span>Explorer</span></div>
@@ -63,32 +63,32 @@
                     <span class="text">Refrescar</span>
                 </a>
             </li>
-            <li class="list" id="audio" :class="{ 'active': tab === 'audio' }">
-                <a href="#" style="--clr: #f44336" x-on:click.prevent="tab = 'audio'">
+            <li class="list" id="audio" :class="{ 'active': $store.globalData.tab === 'audio' }">
+                <a href="#" style="--clr: #f44336" x-on:click.prevent="$store.globalData.tab = 'audio'">
                     <span class="icon" title="Audios"><ion-icon name="musical-notes-outline"></ion-icon></span>
                     <span class="text">Audios</span>
                 </a>
             </li>
-            <li class="list" id="book" :class="{ 'active': tab === 'book' }">
-                <a href="#" style="--clr: #ffa117" x-on:click.prevent="tab = 'book'">
+            <li class="list" id="book" :class="{ 'active': $store.globalData.tab === 'book' }">
+                <a href="#" style="--clr: #ffa117" x-on:click.prevent="$store.globalData.tab = 'book'">
                     <span class="icon" title="Libros"><ion-icon name="book-outline"></ion-icon></span>
                     <span class="text">Libros</span>
                 </a>
             </li>
-            <li class="list" id="video" :class="{ 'active': tab === 'video' }">
-                <a href="#" style="--clr: #0fc70f" x-on:click.prevent="tab = 'video'"> 
+            <li class="list" id="video" :class="{ 'active': $store.globalData.tab === 'video' }">
+                <a href="#" style="--clr: #0fc70f" x-on:click.prevent="$store.globalData.tab = 'video'"> 
                     <span class="icon" title="Vídeos"><ion-icon name="film-outline"></ion-icon></span>
                     <span class="text">Videos</span>
                 </a>
             </li>
-            <li class="list" id="images" :class="{ 'active': tab === 'images' }">
-                <a href="#" style="--clr: #2196f3" x-on:click.prevent="tab = 'images'">
+            <li class="list" id="images" :class="{ 'active': $store.globalData.tab === 'images' }">
+                <a href="#" style="--clr: #2196f3" x-on:click.prevent="$store.globalData.tab = 'images'">
                     <span class="icon" title="Imágenes"><ion-icon name="image-outline"></ion-icon></span>
                     <span class="text">Imágenes</span>
                 </a>
             </li>
-            <li class="list" id="setting" :class="{ 'active': tab === 'setting' }">
-                <a href="#" style="--clr: #b145e9" x-on:click.prevent="tab = 'setting'">
+            <li class="list" id="setting" :class="{ 'active': $store.globalData.tab === 'setting' }">
+                <a href="#" style="--clr: #b145e9" x-on:click.prevent="$store.globalData.tab = 'setting'">
                     <span class="icon" title="Ajustes"><ion-icon name="settings-outline"></ion-icon></span>
                     <span class="text">Ajustes</span>
                 </a>
@@ -124,7 +124,7 @@
             </template>
 
         </div>
-        <div class="op-menu setting" x-show="tab === 'setting'" >
+        <div class="op-menu setting" x-show="$store.globalData.tab === 'setting'" >
             <h2>Ajustes</h2>
             <div class="cont-form">
                 <form method="POST" @submit.prevent="submitForm" x-data="crudAlpine()" x-init="iniciar">
@@ -207,7 +207,7 @@
                                 </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row row-last">
                         <label for="savefile">
                             <input type="checkbox" 
                                 x-model="formData.savefile" 
@@ -216,22 +216,25 @@
                                 Guardar datos en disco (agilizará la aplicación la próxima vez que la use)
                         </label>
                     </div>
-                    <div class="row row-bottom row-button">
-                        <button type="submit" id="save" :disabled="formLoading">
-                            Guardar
-                        </button>
-                        <button id="cancel" :disabled="formLoading">
-                            Cancelar
-                        </button>
-                        <button id="deletefile" :disabled="formLoading">
-                            Borrar datos del disco
-                        </button>
+                    <div class="row">
+                        <div class="row-bottom row-button">
+                            <button type="submit" id="save" :disabled="formLoading">
+                                Guardar
+                            </button>
+                            <button id="cancel" :disabled="formLoading">
+                                Cancelar
+                            </button>
+                            <button id="deletefile" :disabled="formLoading">
+                                Borrar datos del disco
+                            </button>
+                        </div>
+
                     </div>
                 </form>
             </div>
         </div>    
 
-        <div class="media" x-show="tab === 'book'" >
+        <div id="book" class="media book" x-show="$store.globalData.tab === 'book'" >
                             
         <?php
 
@@ -243,6 +246,10 @@
             <!-- <div x-data="{ title: 'Start Here' }">
                 <h1 x-text="title"></h1>
             </div> -->
+                    
+        </div>
+        <div id="images" class="media images" x-show="$store.globalData.tab === 'images'">
+
             <div class="card">
                 <div class="face face1">
                     <div class="content">
@@ -270,7 +277,7 @@
                         <a href="#">Read More</a>
                     </div>
                 </div>
-            </div>
+            </div>  
             <div class="card">
                 <div class="face face1">
                     <div class="content">
@@ -284,7 +291,13 @@
                         <a href="#">Read More</a>
                     </div>
                 </div>
-            </div>            
+            </div>        
+        </div>
+
+        <div id="video" class="media video" x-show="$store.globalData.tab === 'video'">
+        </div>
+
+        <div id="audio" class="media audio" x-show="$store.globalData.tab === 'audio'">
         </div>
 
     </div>
@@ -298,6 +311,31 @@
 
 
         document.addEventListener('alpine:init', () => {
+            Alpine.store('globalData', {
+                tab: 'setting',
+                changeTo(tab) {
+                    this.tab = tab
+                    if (tab != 'setting')
+                    {
+                        fetch(FORM_URL + '?media='+tab)
+                        .then(res => {
+                            if (!res.ok) {
+                                throw new Error(); // Will take you to the `catch` below
+                            }
+                            return res.json();
+                        })
+                        .then(response => {
+                            console.log("exito: " + response)
+                            this.showResponse(response)
+                        })
+                    }
+                },
+                showResponse(data) {
+                    let div = document.querySelector('#' + this.tab)
+                    div.innerHTML = JSON.stringify(data)
+                }
+            })
+
             Alpine.store('noticesHandler', {
                 notices: [],
                 visible: [],
