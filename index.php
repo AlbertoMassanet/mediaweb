@@ -52,43 +52,43 @@
     <script defer src="assets/js/alpine.min.js"></script>
     
 </head>
-<body x-data="{ $store.globalData.tab: 'setting' }">
+<body x-data="">
     <div class="navigation">
         <div class="menuToggle"></div>
         <div class="title-nav"><span>Media</span>&nbsp;<span>Explorer</span></div>
         <ul>
-            <li class="list" id="refresh">
+            <li class="list">
                 <a href="#" style="--clr: #f44336">
                     <span class="icon" title="Refrescar"><ion-icon name="refresh-outline"></ion-icon></span>
                     <span class="text">Refrescar</span>
                 </a>
             </li>
-            <li class="list" id="audio" :class="{ 'active': $store.globalData.tab === 'audio' }">
-                <a href="#" style="--clr: #f44336" x-on:click.prevent="$store.globalData.tab = 'audio'">
+            <li class="list"class="{ 'active': $store.globalData.tab === 'audio' }">
+                <a href="#" style="--clr: #f44336" x-on:click.prevent="$store.globalData.changeTo('audio')">
                     <span class="icon" title="Audios"><ion-icon name="musical-notes-outline"></ion-icon></span>
                     <span class="text">Audios</span>
                 </a>
             </li>
-            <li class="list" id="book" :class="{ 'active': $store.globalData.tab === 'book' }">
-                <a href="#" style="--clr: #ffa117" x-on:click.prevent="$store.globalData.tab = 'book'">
+            <li class="list"lass="{ 'active': $store.globalData.tab === 'book' }">
+                <a href="#" style="--clr: #ffa117" x-on:click.prevent="$store.globalData.changeTo('book')">
                     <span class="icon" title="Libros"><ion-icon name="book-outline"></ion-icon></span>
                     <span class="text">Libros</span>
                 </a>
             </li>
-            <li class="list" id="video" :class="{ 'active': $store.globalData.tab === 'video' }">
-                <a href="#" style="--clr: #0fc70f" x-on:click.prevent="$store.globalData.tab = 'video'"> 
+            <li class="list"class="{ 'active': $store.globalData.tab === 'video' }">
+                <a href="#" style="--clr: #0fc70f" x-on:click.prevent="$store.globalData.changeTo('video')"> 
                     <span class="icon" title="Vídeos"><ion-icon name="film-outline"></ion-icon></span>
                     <span class="text">Videos</span>
                 </a>
             </li>
-            <li class="list" id="images" :class="{ 'active': $store.globalData.tab === 'images' }">
-                <a href="#" style="--clr: #2196f3" x-on:click.prevent="$store.globalData.tab = 'images'">
+            <li class="list":class="{ 'active': $store.globalData.tab === 'images' }">
+                <a href="#" style="--clr: #2196f3" x-on:click.prevent="$store.globalData.changeTo('images')">
                     <span class="icon" title="Imágenes"><ion-icon name="image-outline"></ion-icon></span>
                     <span class="text">Imágenes</span>
                 </a>
             </li>
-            <li class="list" id="setting" :class="{ 'active': $store.globalData.tab === 'setting' }">
-                <a href="#" style="--clr: #b145e9" x-on:click.prevent="$store.globalData.tab = 'setting'">
+            <li class="list" :class="{ 'active': $store.globalData.tab === 'setting' }">
+                <a href="#" style="--clr: #b145e9" x-on:click.prevent="$store.globalData.changeTo('setting')">
                     <span class="icon" title="Ajustes"><ion-icon name="settings-outline"></ion-icon></span>
                     <span class="text">Ajustes</span>
                 </a>
@@ -312,6 +312,9 @@
 
         document.addEventListener('alpine:init', () => {
             Alpine.store('globalData', {
+                init() {
+                    this.tab = 'setting'
+                },
                 tab: 'setting',
                 changeTo(tab) {
                     this.tab = tab
@@ -325,15 +328,42 @@
                             return res.json();
                         })
                         .then(response => {
-                            console.log("exito: " + response)
+                            console.log("exito: " + JSON.stringify(response))
                             this.showResponse(response)
                         })
                     }
                 },
                 showResponse(data) {
-                    let div = document.querySelector('#' + this.tab)
-                    div.innerHTML = JSON.stringify(data)
-                }
+                    let div = document.querySelector('div#' + this.tab)
+                    let d = this.displayData(data, div)
+                    
+                    //div.innerHTML = d
+                    console.log(div)
+                },
+                displayData(data, parent) {
+                    let ret = [];
+                    let count = 0;
+                    if (
+                        typeof data === 'object' &&
+                        !Array.isArray(data) &&
+                        data !== null
+                    )
+                        Object.entries(data).forEach(([key, value]) => {
+
+                            if (typeof value === 'object' && !Array.isArray(value) && value !== null) 
+                                ret = this.displayData(value, parent)
+                            else 
+                                {
+                                    let div = document.createElement('div');
+                                    div.classList.add('temporal')
+                                    div.innerHTML = key + ": " + value;
+                                    parent.appendChild(div);
+                                    ret[count] = div;
+                                    count++;
+                                }
+                        })
+                    return ret;
+                },
             })
 
             Alpine.store('noticesHandler', {
@@ -408,7 +438,7 @@
                         return res.json();})
                     .then(response => { 
                         this.formData = response;
-                        this.runNotif('success');
+                        //this.runNotif('success');
                     })
                     .catch(error => console.log("Ha ocurrido un error: " + error))
                     .finally(() => {

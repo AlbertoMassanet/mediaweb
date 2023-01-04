@@ -21,6 +21,7 @@ class mediaFile
   protected $name_file;
   protected $info;
   protected $getId;
+  protected $getID3;
 
   protected $units = array(
     'bit' => 0.125,

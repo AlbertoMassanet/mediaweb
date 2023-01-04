@@ -29,13 +29,18 @@ function activeLink()
 
 list.forEach((item) => item.addEventListener('click', activeLink))
 
-
-
+/**
+ * Callback params for getImageBrightness
+ * 
+ * @callback bnCallback
+ * @param {string} thisImgID - image id tag
+ * @param {number} brightness - image averange brightness float number 
+ */
 /**
  * Get brightness from an image.
  * 
- * @param {object} image 
- * @param {function} callback 
+ * @param {Object} image - DOM Object
+ * @param {bnCallback} callback - Callback function
  */
 // Usage:
 // var thisImg;

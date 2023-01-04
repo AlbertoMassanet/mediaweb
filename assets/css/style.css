@@ -359,12 +359,24 @@ ion-icon {
   justify-content: center;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
+
+.container .media .temporal
+{
+  padding: 5px;
+  border: 1px solid #2f323f;
+  border-radius: 6px;
+  max-width: 300px;
+}
+
 .container .media .card
 {
   position: relative;
 
 }
+
+
 
 .container .media .card .face
 {
@@ -514,8 +526,20 @@ ion-icon {
 
 .row-button button
 {
+  color: #777;
   padding: 10px 30px;
   cursor: pointer;
+  font-weight: 500;
+  border-radius: 10px;
+  font-size: 1.25em;
+  box-shadow: 5px 5px 10px rgba(0,0,0,0.1),
+    -5px -5px 10px rgba(255,255,255,1);
+}
+
+.row-button button:hover
+{
+  box-shadow: inset 5px 5px 10px rgba(0,0,0,0.1),
+	  inset -5px -5px 10px rgba(255,255,255,1);
 }
 
 .row-last

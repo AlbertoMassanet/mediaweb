@@ -12,11 +12,11 @@ define('RETURN_DELETE_OK', 200);
 define('RETURN_ERROR_BAD_REQUEST', 400);
 
 // Constants
-define('SETTING_JSON_FILE', './save.json');
-
+define('SETTING_JSON_FILE', './config.json');
+define('PATH_DATA_FILES', './');
 
 include_once './src/Media.php';
-include_once './src/vendor/Request/Request.php';
+// include_once './src/vendor/Request/Request.php';
 
 $media_types = [
   "book" => ["epub", "html", "htm", "pdf", "rtf", "txt", "cbc", "fb2", "lit", "mobi", "odt", "doc", "docx", "prc", "pdb", "pml", "cbz", "cbr"],
@@ -29,7 +29,7 @@ $media_types = [
  * Search a media type and return an array
  * 
  * @param String $media media type (audio, video, book or images)
- * @return Array if invalid media type or not found return empty array
+ * @return Array if invalid media type or not found return null
  */
 function executeSearch($media)
 {
@@ -39,16 +39,18 @@ function executeSearch($media)
   if (isset($settingsArr['pathvideo']) && $media == "video") $pathmedia = $settingsArr['pathvideo'];
   if (isset($settingsArr['pathaudio']) && $media == "audio") $pathmedia = $settingsArr['pathaudio'];
   if (isset($settingsArr['pathimage']) && $media == "images") $pathmedia = $settingsArr['pathimage'];
-  if (!isset($pathmedia)) return [];
+  
+  if (!isset($pathmedia)) return null;
   $obj = new Media($pathmedia, $media, $media_types[$media], $settingsArr);
-  return $obj->run();
+  if ($obj) $res = $obj->run();
+  return ($res) ?? $obj->run();
   //TODO
 }
 
 // Read setting json file
 $settingsArr = [];
 if (file_exists(SETTING_JSON_FILE)) $settingsArr = Utils::loadFromFile(SETTING_JSON_FILE);
-
+// die("Leyendo settingArr: " . print_r($settingsArr,true));
 
 $arrRecieved = null;
 $recieved= file_get_contents("php://input");
@@ -67,12 +69,12 @@ if (is_array($arrRecieved))
 
    if (key_exists('savefile', $arrRecieved))
    {
-     if (file_exists(SAVEFILE))
+     if (file_exists(SETTING_JSON_FILE))
      {
-       unlink(SAVEFILE);
+       unlink(SETTING_JSON_FILE);
      }
    
-     $res = Utils::saveToFile(SAVEFILE, $arrRecieved, true);
+     $res = Utils::saveToFile(SETTING_JSON_FILE, $arrRecieved, true);
      
      if (is_string($res))
      {
@@ -98,11 +100,24 @@ if (is_array($arrRecieved))
     } else {
       $objSent = ['error' => 'No file found'];
     }
-  }
-
+  } else
   if (key_exists('media', $_REQUEST))
   {
-    if ($res = executeSearch($_REQUEST['media']) != []) 
+    $res = executeSearch($_REQUEST['media']);
+    //die("No llega nada: " . print_r($res,true));
+    if ($res)
+    {
+      $objSent = $res;
+      $returnType = RETURN_READ_OK;
+    }
+  } else
+  if (in_array($media_types, $_REQUEST)) {
+    foreach ($media_types as $key => $v)
+    {
+      if (array_key_exists($key, $_REQUEST)) $res = executeSearch($key);
+    }
+
+    if ($res)
     {
       $objSent = $res;
       $returnType = RETURN_READ_OK;
@@ -112,7 +127,7 @@ if (is_array($arrRecieved))
 }
 
 
-
+// if ($returnType == RETURN_ERROR_BAD_REQUEST) die("No llega nada: " . print_r($arrRecieved,true));
 
 
 

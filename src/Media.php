@@ -27,7 +27,6 @@ class Media extends mediaFiles
     if (!empty($media_types)) $this->media_types = $media_types;
     if (!empty($settings)) $this->settings = $settings;
     if (isset($this->path)) parent::__construct($this->path);
-    return $this;
   }
 
   public function setMediaTypes($media_types)
@@ -56,6 +55,6 @@ class Media extends mediaFiles
 
   public function run()
   {
-    
+    return $this->showTree();
   }
 }
