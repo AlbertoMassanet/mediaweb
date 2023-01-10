@@ -108,6 +108,40 @@ class mediaFiles
     return ($list) ?? @$list;
   }
 
+  protected function advTree($path){
+    static $match;
+
+    // Find the real directory part of the path, and set the match parameter
+    $last=strrpos($path,"/");
+    if(!is_dir($path)){
+      $match=substr($path,$last);
+      while(!is_dir($path=substr($path,0,$last)) && $last!==false)
+        $last=strrpos($path,"/",-1);
+    }
+    $patt = (!empty($this->media_types) && !empty($this->media)) ? '.{' . implode(',', $this->media_types) . '}' : '';
+    if(empty($match)) $match="/*" . $patt;
+    if(!$path=realpath($path)) return;
+
+    // List files
+    foreach(glob($path.$match, GLOB_BRACE) as $file){
+      if (!empty($this->media))
+      {
+        $objFile = $this->getObj($this->media, $file);
+        $res = $objFile->getFullData();
+      }
+      $list[]= (isset($res) && !empty($res)) ? $res : substr($file,strrpos($file,"/")+1);
+    } 
+
+    // Process sub directories
+    foreach(glob("$path/*", GLOB_ONLYDIR) as $dir){
+      $r = $this->tree($dir);
+      if ($r) $list[substr($dir,strrpos($dir,"/",-1)+1)]=$r;
+    }
+  
+    return ($list) ?? @$list;
+  }
+
+
   public function getRecursiveFolderList($curDir,$currentA=false)
   {                   
     $dirs = glob($curDir . '/*', GLOB_ONLYDIR);    
@@ -151,5 +185,25 @@ class mediaFiles
         }
     }
     return $files;
+  }
+
+  private function getObj($media, $file)
+  {
+    $ret = null;
+    switch ($media) {
+      case 'book':
+        $ret = new mediaBook($file);
+        break;
+      case 'audio':
+        $ret = new mediaAudio($file);
+        break;
+      case 'video':
+        $ret = new mediaVideo($file);
+        break;
+      case 'images':
+        $ret = new mediaImages($file);
+        break;
+    }
+    return $ret;
   }
 }
