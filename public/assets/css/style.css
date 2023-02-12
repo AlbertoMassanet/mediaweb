@@ -351,7 +351,18 @@ ion-icon {
   width: 100%;
 }
 
+.container .home
+{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+}
 
+.container .home img
+{
+  max-height: 60vh;
+}
 
 .container .media
 {

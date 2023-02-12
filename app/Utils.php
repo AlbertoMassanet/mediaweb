@@ -1,6 +1,8 @@
 <?php
 
+namespace app;
 
+use Exception;
 
 class Utils
 {

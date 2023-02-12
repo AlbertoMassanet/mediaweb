@@ -55,6 +55,6 @@ class Media extends mediaFiles
 
   public function run()
   {
-    return $this->showTree();
+    return (isset($this->path)) ? $this->advTree($this->path) : null;
   }
 }

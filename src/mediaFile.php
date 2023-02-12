@@ -47,26 +47,7 @@ class mediaFile
     } else throw new Exception("{$file} is not a file.");
   }
 
-  public function getFullData()
-  {
-    $ret = [];
 
-    $n = $this->getFriendlyName();
-    $n = (!empty($n)) ? $n : $this->name_file;
-    // Datos básicos del sistema
-    $ret[$n]['system'] = $this->getSimpleInfo();
-
-
-    // Cover si lo hubiera
-    $c = $this->getCover();
-    if (!empty($c)) $ret[$n]['cover'] = (count($c) > 1) ? $c : $c[0];
-
-    // Metadata si lo hubiera
-    $r = $this->getMetadata();
-    if (!empty($r)) $ret[$n]['metadata'] = $r;
-
-    return $ret;
-  }
 
   private function initializeID3()
   {
@@ -120,56 +101,39 @@ class mediaFile
       return (isset($this->info['size'])) ? $this->info['size'] * $n_type : 0;
   }
 
-  protected function getBase64()
-  {
-    if (!array_key_exists('fileformat', $this->info)) return null;
-
-    $data = file_get_contents($this->fullfile);
-    $base64 = 'data:image/' . ((strtolower($this->info['fileformat']) == 'svg') ? 'svg+xml' : $this->info['fileformat']) . ';base64,';
-    return $base64 . base64_encode($data);
-  }
-
   protected function getFriendlyName()
   {
-    if (!array_key_exists('filerealname', $this->info)) return null;
+    if (!isset($this->info)) $this->getSimpleInfo();
     $n = '';
     $n = $this->info['filerealname'];
     $n = str_replace("_", " ", $n);
+    $n = preg_replace('/\\.[^.\\s]{3,4}$/', '', $n); // Extra extensions removes
+    $n = str_replace(".", " ", $n); // Extra dots
     $n = strtolower($n);
     $n = ucwords($n);
     return $n;
   }
 
-  protected function getCover()
+  public function getCover()
   {
     $ret = [];
+
+    $ret = $this->arrItinerator($this->aceptableCoverFiles);
+
+    return $ret;
+  }
+
+  public function getMetadataFiles()
+  {
+    $ret = [];
+
+    $ret = $this->arrItinerator($this->aceptableMetadataFiles);
 
 
     return $ret;
   }
 
-  protected function getMetadata()
-  {
-    $ret = [];
-
-
-
-
-    return $ret;
-  }
-
-  protected function findPartnerFiles()
-  {
-    $ret = [];
-    // Empezamos por el cover : $aceptableCoverFiles
-
-
-    // Luego los metadatos : $aceptableMetadataFiles
-
-
-    return $ret;
-  }
-
+  
   private function arrItinerator($arr)
   {
     if (empty($arr)) return $arr;

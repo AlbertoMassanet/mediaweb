@@ -134,7 +134,7 @@ class mediaFiles
 
     // Process sub directories
     foreach(glob("$path/*", GLOB_ONLYDIR) as $dir){
-      $r = $this->tree($dir);
+      $r = $this->advTree($dir);
       if ($r) $list[substr($dir,strrpos($dir,"/",-1)+1)]=$r;
     }
   

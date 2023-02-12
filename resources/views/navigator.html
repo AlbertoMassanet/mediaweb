@@ -1,0 +1,48 @@
+<div class="navigation">
+        <div class="menuToggle"></div>
+        <div class="title-nav"><span>Media</span>&nbsp;<span>Explorer</span></div>
+        <ul>
+            <li class="list">
+                <a href="#" style="--clr: #f44336">
+                    <span class="icon" title="Refrescar"><ion-icon name="refresh-outline"></ion-icon></span>
+                    <span class="text">Refrescar</span>
+                </a>
+            </li>
+            <li class="list{% if($active == 'home'): %} active{% endif; %}">
+                <a href="/" style="--clr: #0000a0">
+                    <span class="icon" title="Audios"><ion-icon name="home-outline"></ion-icon></span>
+                    <span class="text">Inicio</span>
+                </a>
+            </li>
+            <li class="list{% if($active == 'audio'): %} active{% endif; %}">
+                <a href="/audio" style="--clr: #f44336">
+                    <span class="icon" title="Audios"><ion-icon name="musical-notes-outline"></ion-icon></span>
+                    <span class="text">Audios</span>
+                </a>
+            </li>
+            <li class="list{% if($active == 'book'): %} active{% endif; %}">
+                <a href="/book" style="--clr: #ffa117">
+                    <span class="icon" title="Libros"><ion-icon name="book-outline"></ion-icon></span>
+                    <span class="text">Libros</span>
+                </a>
+            </li>
+            <li class="list{% if($active == 'video'): %} active{% endif; %}">
+                <a href="/video" style="--clr: #0fc70f"> 
+                    <span class="icon" title="Vídeo"><ion-icon name="film-outline"></ion-icon></span>
+                    <span class="text">Video</span>
+                </a>
+            </li>
+            <li class="list{% if($active == 'image'): %} active{% endif; %}">
+                <a href="/image" style="--clr: #2196f3">
+                    <span class="icon" title="Imágenes"><ion-icon name="image-outline"></ion-icon></span>
+                    <span class="text">Imágenes</span>
+                </a>
+            </li>
+            <li class="list{% if($active == 'setting'): %} active{% endif; %}">
+                <a href="/setting" style="--clr: #b145e9">
+                    <span class="icon" title="Ajustes"><ion-icon name="settings-outline"></ion-icon></span>
+                    <span class="text">Ajustes</span>
+                </a>
+            </li>
+        </ul>
+    </div>

@@ -28,6 +28,41 @@ class mediaBook extends mediaFile
     } else return $this;
   }
 
+  public function getFullData()
+  {
+    $ret = [];
+
+    $n = $this->getFriendlyName();
+    $n = (!empty($n)) ? $n : $this->name_file;
+    // Datos básicos del sistema
+    $ret[$n]['system'] = $this->getSimpleInfo();
+
+
+    // Cover si lo hubiera
+    $c = $this->getCover();
+    if (is_array($c) && !empty($c))
+      if (count($c) > 1) {
+        $r = [];
+        foreach ($c as $img)
+          $r[] = Utils::getBase64FromFileImage($img);
+          $ret[$n]['cover'] = $r;
+      } else {
+        $ret[$n]['cover'] = Utils::getBase64FromFileImage($c[0]);
+      }
+
+    // Metadata si lo hubiera
+    $r = $this->getMetadataFiles();
+    if (!empty($r) && is_array($r)) 
+    {
+      // Solo toma el primero
+      $opfFile = $r[0];
+
+      $ret[$n]['metadata'] = $r;
+    }
+
+    return $ret;
+  }
+
   public function setFile($file)
   {
     if (is_file($file) && in_array(Utils::getExtension($file), $this->detectableFiles))
@@ -39,90 +74,6 @@ class mediaBook extends mediaFile
   public function Info()
   {
     return $this->getSimpleInfo();
-  }
-
-  public function getCover()
-  {
-    $rt = $this->findNearestCoverFiles();
-
-  }
-
-  public function getArrayFromOPF()
-  {
-    if ($file_opf = $this->findNearestMetadataFiles())
-    {
-      $this->opf = new OPFReader($file_opf);
-    }
-  }
-
-  protected function findCoverFromOpf()
-  {
-    
-  }
-
-  protected function findNearestCoverFiles()
-  {
-    $ret = $this->findNearestFiles(self::FIND_FILE_COVER);
-    return (!empty($ret)) ?? $ret;
-  }
-
-  protected function findNearestMetadataFiles()
-  {
-    $ret = $this->findNearestFiles(self::FIND_FILE_METADATA);
-    return (!empty($ret)) ?? $ret;   
-  }
-
-  protected function findNearestFiles($typeFile)
-  {
-    $list = [];
-    $imagesTypes = [];
-    $patternFiles = [];
-    $acceptables = [];
-
-    switch ($typeFile) {
-      case self::FIND_FILE_COVER:
-        $acceptables = $this->aceptableCoverFiles;
-        break;
-
-      case self::FIND_FILE_METADATA:
-        $acceptables = $this->aceptableMetadataFiles;
-        break;
-      default:
-        return null;
-
-    }
-
-
-    foreach($acceptables as $typefiles)
-    {
-      if (strrpos($typefiles,".") !== false)
-      {
-        // complete filename or name.*
-        $patternFiles[] = $typefiles;
-      } else {
-        // extensions
-        $imagesTypes[] = $typefiles;
-      }
-    }
-
-    foreach ($patternFiles as $findFiles)
-    {
-      if (strrpos($findFiles,"*") !== false) 
-      {
-        foreach($imagesTypes as $ext)
-          foreach(glob($this->path_file.PATH_SEPARATOR.'*'.$this->name_file.'*.'.$ext) as $file)
-            $list[] = $file;
-      } else {
-        if (file_exists($this->path_file.PATH_SEPARATOR.$this->name_file.'.'.$typefiles)) $list[] = $this->path_file.PATH_SEPARATOR.$typefiles;
-      }
-    }
-
-    return $list;
-  }
-
-  public function findAuxiliarFiles()
-  {
-    //TODO
   }
 
   public function getOPFData($metadataFile, $metatags = [])
